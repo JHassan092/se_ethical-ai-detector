@@ -1,5 +1,7 @@
 import express from "express";
 
+import { runRuleChecks } from "../services/ruleChecker.js";
+
 const router = express.Router();
 
 router.post("/", (req, res) => {
@@ -11,11 +13,13 @@ router.post("/", (req, res) => {
     });
   }
 
+  const ruleIssues = runRuleChecks(text);
+
   return res.json({
-    allowed: true,
-    risk_level: "low",
-    issues: [],
-    message: "Verification module not yet implemented",
+    allowed: ruleIssues.length === 0,
+    risk_level: ruleIssues.length > 0 ? "medium" : "low",
+    issues: ruleIssues,
+    message: "Rule-based checks completed",
   });
 });
 
